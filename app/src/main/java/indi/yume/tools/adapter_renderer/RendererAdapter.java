@@ -6,17 +6,31 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by yume on 15/7/22.
  */
 public class RendererAdapter<T> extends BaseAdapter {
 
-    List<T> contentList;
-    LayoutInflater layoutInflater;
-    Context context;
-    BaseRendererBuilder<T> rendererBuilder;
+    private List<T> contentList;
+    private LayoutInflater layoutInflater;
+    private Context context;
+    private BaseRendererBuilder<T> rendererBuilder;
+    private Map<String, Object> extraDataMap = new HashMap<>();
+    private ExtraDataCallback extraDataCallback = new ExtraDataCallback() {
+        @Override
+        public void putExtra(String key, Object data) {
+            extraDataMap.put(key, data);
+        }
+
+        @Override
+        public Object getExtraData(String key) {
+            return extraDataMap.get(key);
+        }
+    };
 
     public RendererAdapter(List<T> contentList, Context context, BaseRendererBuilder<T> rendererBuilder){
         this.contentList = contentList;
@@ -38,6 +52,10 @@ public class RendererAdapter<T> extends BaseAdapter {
 
     public void setContentList(List<T> contentList) {
         this.contentList = contentList;
+    }
+
+    public void clearExtraData(){
+        extraDataMap.clear();
     }
 
     @Override
@@ -62,6 +80,7 @@ public class RendererAdapter<T> extends BaseAdapter {
                 .setConvertView(convertView)
                 .setLayoutInflater(layoutInflater)
                 .setParent(parent)
+                .setExtraDataCallback(extraDataCallback)
                 .build();
         if(renderer instanceof ContextAware)
             ((ContextAware)renderer).setContext(context);

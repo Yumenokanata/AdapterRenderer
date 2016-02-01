@@ -15,7 +15,7 @@ public abstract class BaseRendererBuilder<T> {
     private View convertView;
     private ViewGroup parent;
     private LayoutInflater layoutInflater;
-
+    private ExtraDataCallback extraDataCallback;
 
     public BaseRendererBuilder<T> setContent(T content, int position) {
         this.content = content;
@@ -35,6 +35,11 @@ public abstract class BaseRendererBuilder<T> {
 
     public BaseRendererBuilder<T> setLayoutInflater(LayoutInflater layoutInflater) {
         this.layoutInflater = layoutInflater;
+        return this;
+    }
+
+    public BaseRendererBuilder<T> setExtraDataCallback(ExtraDataCallback extraDataCallback) {
+        this.extraDataCallback = extraDataCallback;
         return this;
     }
 
@@ -62,7 +67,7 @@ public abstract class BaseRendererBuilder<T> {
     protected BaseRenderer<T> create(){
         BaseRenderer<T> renderer;
         renderer = getRendererByIndex(getTypeClassIndex(content));
-        renderer.onCreate(content, position, layoutInflater, parent);
+        renderer.onCreate(content, position, layoutInflater, parent, extraDataCallback);
         return renderer;
     }
 

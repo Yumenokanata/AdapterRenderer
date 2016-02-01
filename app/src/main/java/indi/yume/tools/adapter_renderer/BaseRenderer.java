@@ -11,6 +11,7 @@ public abstract class BaseRenderer<T> {
     private T content;
     private View view;
     private int position;
+    private ExtraDataCallback extraDataCallback;
 
     public T getContent() {
         return content;
@@ -33,12 +34,28 @@ public abstract class BaseRenderer<T> {
         return position;
     }
 
-    public void onCreate(T content, int position, LayoutInflater layoutInflater, ViewGroup parent){
+    public void onCreate(T content, int position, LayoutInflater layoutInflater, ViewGroup parent, ExtraDataCallback extraDataCallback){
+        this.extraDataCallback = extraDataCallback;
         this.content = content;
         this.position = position;
         view = inflate(layoutInflater, parent);
         findView(view);
         setListener(view);
+    }
+
+    protected Object getExtra(){
+        if(extraDataCallback == null)
+            return null;
+        return extraDataCallback.getExtraData(getExtraKey(position));
+    }
+
+    protected void putExtra(Object object){
+        if(extraDataCallback != null)
+            extraDataCallback.putExtra(getExtraKey(position), object);
+    }
+
+    private static String getExtraKey(int position){
+        return String.valueOf(position);
     }
 
     public abstract void render();
