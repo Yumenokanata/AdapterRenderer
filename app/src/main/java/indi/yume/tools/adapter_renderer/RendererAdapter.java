@@ -30,6 +30,12 @@ public class RendererAdapter<T> extends BaseAdapter {
         public Object getExtraData(String key) {
             return extraDataMap.get(key);
         }
+
+        @Override
+        public void refreshAllData() {
+            extraDataMap.clear();
+            notifyDataSetChanged();
+        }
     };
 
     public RendererAdapter(List<T> contentList, Context context, BaseRendererBuilder<T> rendererBuilder){

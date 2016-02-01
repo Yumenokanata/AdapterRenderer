@@ -64,6 +64,11 @@ public abstract class BaseRenderer<T> {
             extraDataCallback.putExtra(getExtraKey(position), object);
     }
 
+    protected void notifyDataHasChanged(){
+        if(extraDataCallback != null)
+            extraDataCallback.refreshAllData();
+    }
+
     private static String getExtraKey(int position){
         return String.valueOf(position);
     }
