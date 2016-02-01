@@ -15,7 +15,7 @@ allprojects {
 Step2: 在工程中添加依赖：
 ```groovy
 dependencies {
-    compile 'com.github.Yumenokanata:AdapterRenderer:1.1.3'
+    compile 'com.github.Yumenokanata:AdapterRenderer:1.1.4'
 }
 ```
 
