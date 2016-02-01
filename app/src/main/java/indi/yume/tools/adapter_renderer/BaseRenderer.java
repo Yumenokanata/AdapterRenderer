@@ -49,6 +49,11 @@ public abstract class BaseRenderer<T> {
         return extraDataCallback.getExtraData(getExtraKey(position));
     }
 
+    protected Object getExtra(Object defaultValue){
+        Object data = getExtra();
+        return data != null ? data : defaultValue;
+    }
+
     protected void putExtra(Object object){
         if(extraDataCallback != null)
             extraDataCallback.putExtra(getExtraKey(position), object);
