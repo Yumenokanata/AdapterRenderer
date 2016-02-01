@@ -54,6 +54,11 @@ public abstract class BaseRenderer<T> {
         return data != null ? data : defaultValue;
     }
 
+    protected Object getExtra(lazyLoadFun lazyLoadFun){
+        Object data = getExtra();
+        return data != null ? data : lazyLoadFun.getValue();
+    }
+
     protected void putExtra(Object object){
         if(extraDataCallback != null)
             extraDataCallback.putExtra(getExtraKey(position), object);
@@ -71,4 +76,8 @@ public abstract class BaseRenderer<T> {
     protected abstract void findView(View rootView);
 
     protected abstract void setListener(View rootView);
+
+    public interface lazyLoadFun{
+        Object getValue();
+    }
 }
