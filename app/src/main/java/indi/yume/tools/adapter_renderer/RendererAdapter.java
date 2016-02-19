@@ -100,6 +100,8 @@ public class RendererAdapter<T> extends BaseAdapter {
         return renderer.getView();
     }
 
+    protected <K extends BaseRenderer<T>> void doForEveryRenderer(K renderer) { }
+
     @Override
     public int getItemViewType(int position) {
         return rendererBuilder.getTypeClassIndex(contentList.get(position));
