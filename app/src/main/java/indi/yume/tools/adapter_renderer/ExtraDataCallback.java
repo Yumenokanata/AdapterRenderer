@@ -6,5 +6,6 @@ package indi.yume.tools.adapter_renderer;
 public interface ExtraDataCallback {
     public void putExtra(String key, Object data);
     public Object getExtraData(String key);
+    public int getContentLength();
     public void refreshAllData();
 }

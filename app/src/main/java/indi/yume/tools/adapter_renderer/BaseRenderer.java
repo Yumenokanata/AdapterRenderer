@@ -73,6 +73,10 @@ public abstract class BaseRenderer<T> {
         return String.valueOf(position);
     }
 
+    protected int getContentLength() {
+        return extraDataCallback != null ? extraDataCallback.getContentLength() : 0;
+    }
+
     public abstract void render();
 
     protected abstract View inflate(LayoutInflater layoutInflater, ViewGroup parent);

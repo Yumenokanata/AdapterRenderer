@@ -32,6 +32,11 @@ public class RendererAdapter<T> extends BaseAdapter {
         }
 
         @Override
+        public int getContentLength() {
+            return contentList != null ? contentList.size() : 0;
+        }
+
+        @Override
         public void refreshAllData() {
             extraDataMap.clear();
             notifyDataSetChanged();
