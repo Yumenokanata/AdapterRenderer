@@ -95,6 +95,7 @@ public class RendererAdapter<T> extends BaseAdapter {
                 .build();
         if(renderer instanceof ContextAware)
             ((ContextAware)renderer).setContext(context);
+        doForEveryRenderer(renderer);
         renderer.render();
 
         return renderer.getView();
