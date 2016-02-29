@@ -125,7 +125,7 @@ public class RendererAdapter<VH extends BaseRenderer<M>, M> extends RecyclerView
     public void remove(int position) {
         notifyItemRemoved(position);
         contentList.remove(position);
-        notifyItemRangeChanged(position, getItemCount());
+        notifyItemRangeChanged(0, getItemCount());
     }
 
     @Override
@@ -151,7 +151,7 @@ public class RendererAdapter<VH extends BaseRenderer<M>, M> extends RecyclerView
         for(int i = 0; i < itemCount; i++)
             if(fromPosition < contentList.size())
                 contentList.remove(fromPosition);
-        notifyItemRangeChanged(fromPosition, getItemCount());
+        notifyItemRangeChanged(0, getItemCount());
     }
 
     @Override
