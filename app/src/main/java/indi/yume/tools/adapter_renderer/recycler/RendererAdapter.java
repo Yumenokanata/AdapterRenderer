@@ -3,10 +3,13 @@ package indi.yume.tools.adapter_renderer.recycler;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +23,10 @@ public class RendererAdapter<VH extends BaseRenderer<M>, M> extends RecyclerView
     private LayoutInflater layoutInflater;
     private Context context;
     private BaseRendererBuilder<VH, M> rendererBuilder;
-    private Map<String, Object> extraDataMap;
+    private Map<String, Object> extraDataMap = new HashMap<>();
+
+    private OnItemClickListener<M> onItemClickListener;
+    private OnLongClickListener<M> onLongClickListener;
 
     public RendererAdapter(List<M> contentList, Context context, Class<VH> renderClazz) {
         this(contentList, context, new SingleRenderBuilder<>(renderClazz));
@@ -42,17 +48,20 @@ public class RendererAdapter<VH extends BaseRenderer<M>, M> extends RecyclerView
 
         if(renderer != null)
             return renderer.getViewHolder();
-        else
-            return null;
+
+        return null;
     }
 
     @Override
-    public void onBindViewHolder(RendererViewHolder<M> holder, int position) {
+    public void onBindViewHolder(RendererViewHolder<M> holder, final int position) {
         BaseRenderer<M> renderer = holder.getRenderer();
         renderer.setContent(getItem(position));
         doForEveryRenderer(renderer, holder.getItemViewType());
         if(renderer instanceof ContextAware)
             ((ContextAware)renderer).setContext(context);
+        renderer.setOnItemClickListener(onItemClickListener);
+        renderer.setOnLongClickListener(onLongClickListener);
+
         renderer.render();
     }
 
@@ -70,6 +79,16 @@ public class RendererAdapter<VH extends BaseRenderer<M>, M> extends RecyclerView
 
     public M getItem(int position) {
         return contentList.get(position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener<M> onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+        notifyDataSetChanged();
+    }
+
+    public void setOnLongClickListener(OnLongClickListener<M> onLongClickListener) {
+        this.onLongClickListener = onLongClickListener;
+        notifyDataSetChanged();
     }
 
     @Override

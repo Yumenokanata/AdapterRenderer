@@ -14,6 +14,22 @@ public abstract class BaseRenderer<M>{
     private RendererViewHolder<M> viewHolder;
     private RendererCallBack<M> rendererCallBack;
 
+    private OnItemClickListener<M> onItemClickListener;
+    private OnLongClickListener<M> onLongClickListener;
+    private View.OnClickListener viewOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if(onItemClickListener != null)
+                onItemClickListener.onItemClick(v, content, getAdapterPosition());
+        }
+    };
+    private View.OnLongClickListener viewOnLongClickListener = new View.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View v) {
+            return onLongClickListener != null && onLongClickListener.onLongClick(v, content, getAdapterPosition());
+        }
+    };
+
     public M getContent() {
         return content;
     }
@@ -43,6 +59,16 @@ public abstract class BaseRenderer<M>{
         viewHolder = new RendererViewHolder<>(inflate(layoutInflater, parent), this);
         findView(viewHolder.itemView);
         setListener(viewHolder.itemView);
+        viewHolder.itemView.setOnClickListener(viewOnClickListener);
+        viewHolder.itemView.setOnLongClickListener(viewOnLongClickListener);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener<M> onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
+
+    public void setOnLongClickListener(OnLongClickListener<M> onLongClickListener) {
+        this.onLongClickListener = onLongClickListener;
     }
 
     protected Object getExtra(){

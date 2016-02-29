@@ -2,6 +2,7 @@ package indi.yume.tools.adapter_renderer.recycler;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.AdapterView;
 
 import indi.yume.tools.adapter_renderer.*;
 
@@ -18,5 +19,5 @@ public class RendererViewHolder<M> extends RecyclerView.ViewHolder {
 
     public BaseRenderer<M> getRenderer() {
         return renderer;
-    };
+    }
 }
