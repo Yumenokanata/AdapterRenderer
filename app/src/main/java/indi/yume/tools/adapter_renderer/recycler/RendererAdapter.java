@@ -116,15 +116,15 @@ public class RendererAdapter<VH extends BaseRenderer<M>, M> extends RecyclerView
 
     @Override
     public void insert(int position, M model) {
-        notifyItemInserted(position);
         contentList.add(position, model);
+        notifyItemInserted(position);
         notifyItemRangeChanged(position, getItemCount());
     }
 
     @Override
     public void remove(int position) {
-        notifyItemRemoved(position);
         contentList.remove(position);
+        notifyItemRemoved(position);
         notifyItemRangeChanged(0, getItemCount());
     }
 
@@ -140,17 +140,17 @@ public class RendererAdapter<VH extends BaseRenderer<M>, M> extends RecyclerView
 
     @Override
     public void insertRange(int position, Collection<M> dataSet) {
-        notifyItemRangeInserted(position, dataSet.size());
         contentList.addAll(position, dataSet);
+        notifyItemRangeInserted(position, dataSet.size());
         notifyItemRangeChanged(position, getItemCount());
     }
 
     @Override
     public void removeRange(int fromPosition, int itemCount) {
-        notifyItemRangeRemoved(fromPosition, itemCount);
         for(int i = 0; i < itemCount; i++)
             if(fromPosition < contentList.size())
                 contentList.remove(fromPosition);
+        notifyItemRangeRemoved(fromPosition, itemCount);
         notifyItemRangeChanged(0, getItemCount());
     }
 
