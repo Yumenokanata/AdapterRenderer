@@ -14,19 +14,19 @@ public abstract class BaseRenderer<M>{
     private RendererViewHolder<M> viewHolder;
     private RendererCallBack<M> rendererCallBack;
 
-    private OnItemClickListener<M> onItemClickListener;
-    private OnLongClickListener<M> onLongClickListener;
+    private OnItemClickListener onItemClickListener;
+    private OnLongClickListener onLongClickListener;
     private View.OnClickListener viewOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             if(onItemClickListener != null)
-                onItemClickListener.onItemClick(v, content, getAdapterPosition());
+                onItemClickListener.onItemClick(v, getAdapterPosition());
         }
     };
     private View.OnLongClickListener viewOnLongClickListener = new View.OnLongClickListener() {
         @Override
         public boolean onLongClick(View v) {
-            return onLongClickListener != null && onLongClickListener.onLongClick(v, content, getAdapterPosition());
+            return onLongClickListener != null && onLongClickListener.onLongClick(v, getAdapterPosition());
         }
     };
 
@@ -63,11 +63,11 @@ public abstract class BaseRenderer<M>{
         viewHolder.itemView.setOnLongClickListener(viewOnLongClickListener);
     }
 
-    public void setOnItemClickListener(OnItemClickListener<M> onItemClickListener) {
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
 
-    public void setOnLongClickListener(OnLongClickListener<M> onLongClickListener) {
+    public void setOnLongClickListener(OnLongClickListener onLongClickListener) {
         this.onLongClickListener = onLongClickListener;
     }
 

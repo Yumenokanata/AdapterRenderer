@@ -38,10 +38,10 @@ public class MainActivity extends AppCompatActivity {
         setButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                adapter.setOnItemClickListener(new OnItemClickListener<TestModel>() {
+                adapter.setOnItemClickListener(new OnItemClickListener() {
                     @Override
-                    public void onItemClick(View view, TestModel content, int position) {
-                        Toast.makeText(MainActivity.this, content.getCompanyName(), Toast.LENGTH_SHORT).show();
+                    public void onItemClick(View view, int position) {
+                        Toast.makeText(MainActivity.this, adapter.getItem(position).getCompanyName(), Toast.LENGTH_SHORT).show();
                     }
                 });
             }

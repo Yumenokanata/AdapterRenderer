@@ -25,8 +25,8 @@ public class RendererAdapter<VH extends BaseRenderer<M>, M> extends RecyclerView
     private BaseRendererBuilder<VH, M> rendererBuilder;
     private Map<String, Object> extraDataMap = new HashMap<>();
 
-    private OnItemClickListener<M> onItemClickListener;
-    private OnLongClickListener<M> onLongClickListener;
+    private OnItemClickListener onItemClickListener;
+    private OnLongClickListener onLongClickListener;
 
     public RendererAdapter(List<M> contentList, Context context, Class<VH> renderClazz) {
         this(contentList, context, new SingleRenderBuilder<>(renderClazz));
@@ -81,12 +81,20 @@ public class RendererAdapter<VH extends BaseRenderer<M>, M> extends RecyclerView
         return contentList.get(position);
     }
 
-    public void setOnItemClickListener(OnItemClickListener<M> onItemClickListener) {
+    public List<M> getContentList() {
+        return contentList;
+    }
+
+    public void setContentList(List<M> contentList) {
+        this.contentList = contentList;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
         notifyDataSetChanged();
     }
 
-    public void setOnLongClickListener(OnLongClickListener<M> onLongClickListener) {
+    public void setOnLongClickListener(OnLongClickListener onLongClickListener) {
         this.onLongClickListener = onLongClickListener;
         notifyDataSetChanged();
     }
