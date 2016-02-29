@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    tools:background="@color/color_wh"
+
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="23dp"
+    android:paddingBottom="23dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/item_title_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            tools:text="チューリッヒ生命 (Zurich)社名非公開(流通・小売・サービス)"
+            android:textSize="16sp"
+            android:textColor="@color/color_gr1"/>
+
+        <TextView
+            android:id="@+id/item_sub_title_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            tools:text="2007年5月 ~ 2008年7月"
+            android:textSize="14sp"
+            android:textColor="@color/color_gr3"
+
+            android:layout_marginTop="12dp"/>
+
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/move_up_btn"
+        android:layout_width="60dp"
+        android:layout_height="30dp"
+        android:background="@drawable/icon_up"
+
+        android:layout_marginStart="23dp"/>
+
+    <ImageButton
+        android:id="@+id/move_down_btn"
+        android:layout_width="60dp"
+        android:layout_height="30dp"
+        android:background="@drawable/icon_down"
+
+        android:layout_marginEnd="23dp"/>
+
+    <ImageView
+        android:id="@+id/delete_item_btn"
+        android:layout_width="16dp"
+        android:layout_height="36dp"
+        android:src="@drawable/icon_delete"
+        android:scaleType="fitCenter"/>
+
+</LinearLayout>
