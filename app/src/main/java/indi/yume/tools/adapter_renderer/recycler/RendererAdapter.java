@@ -18,21 +18,21 @@ import indi.yume.tools.adapter_renderer.ContextAware;
 /**
  * Created by yume on 16-2-29.
  */
-public class RendererAdapter<VH extends BaseRenderer<M>, M> extends RecyclerView.Adapter<RendererViewHolder<M>> implements RendererCallBack<M>{
+public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<M>> implements RendererCallBack<M>{
     private List<M> contentList;
     private LayoutInflater layoutInflater;
     private Context context;
-    private BaseRendererBuilder<VH, M> rendererBuilder;
+    private BaseRendererBuilder<M> rendererBuilder;
     private Map<String, Object> extraDataMap = new HashMap<>();
 
     private OnItemClickListener onItemClickListener;
     private OnLongClickListener onLongClickListener;
 
-    public RendererAdapter(List<M> contentList, Context context, Class<VH> renderClazz) {
+    public RendererAdapter(List<M> contentList, Context context, Class<? extends BaseRenderer<M>> renderClazz) {
         this(contentList, context, new SingleRenderBuilder<>(renderClazz));
     }
 
-    public RendererAdapter(List<M> contentList, Context context, BaseRendererBuilder<VH, M> rendererBuilder) {
+    public RendererAdapter(List<M> contentList, Context context, BaseRendererBuilder<M> rendererBuilder) {
         this.contentList = contentList;
         this.context = context;
         layoutInflater = LayoutInflater.from(context);
@@ -41,7 +41,7 @@ public class RendererAdapter<VH extends BaseRenderer<M>, M> extends RecyclerView
 
     @Override
     public RendererViewHolder<M> onCreateViewHolder(ViewGroup parent, int viewType) {
-        VH renderer = rendererBuilder.setParent(parent)
+        BaseRenderer<M> renderer = rendererBuilder.setParent(parent)
                 .setLayoutInflater(layoutInflater)
                 .setRendererCallback(this)
                 .build(viewType);

@@ -3,10 +3,10 @@ package indi.yume.tools.adapter_renderer.recycler;
 /**
  * Created by yume on 16-2-29.
  */
-public class SingleRenderBuilder<VH extends BaseRenderer<M>, M> extends BaseRendererBuilder<VH, M> {
-    private Class<VH> rendererClazz;
+public class SingleRenderBuilder<M> extends BaseRendererBuilder<M> {
+    private Class<? extends BaseRenderer<M>> rendererClazz;
 
-    public SingleRenderBuilder(Class<VH> rendererClazz) {
+    public SingleRenderBuilder(Class<? extends BaseRenderer<M>> rendererClazz) {
         this.rendererClazz = rendererClazz;
     }
 
@@ -16,7 +16,7 @@ public class SingleRenderBuilder<VH extends BaseRenderer<M>, M> extends BaseRend
     }
 
     @Override
-    public VH getRenderer(int viewType) {
+    public BaseRenderer<M> getRenderer(int viewType) {
         try {
             return rendererClazz.newInstance();
         } catch (InstantiationException e) {

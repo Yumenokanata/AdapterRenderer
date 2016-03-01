@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 //        recyclerView.setItemAnimator(new FadeInLeftAnimator());
-        RendererAdapter<CreateCompanyJobItemRenderer, TestModel> adapter = new RendererAdapter<>(getTestList(), this, CreateCompanyJobItemRenderer.class);
+        RendererAdapter<TestModel> adapter = new RendererAdapter<>(getTestList(), this, CreateCompanyJobItemRenderer.class);
         recyclerView.setAdapter(adapter);
 
         setButton.setOnClickListener(new View.OnClickListener() {
