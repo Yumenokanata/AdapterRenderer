@@ -1,6 +1,10 @@
 package indi.yume.demo.renderdemo;
 
+import android.graphics.Color;
+import android.support.v4.view.MotionEventCompat;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -55,6 +59,19 @@ public class CreateCompanyJobItemRenderer extends BaseRenderer<TestModel> {
         moveDownBtn.setOnClickListener(v -> {
             moveDown();
         });
-        deleteItemBtn.setOnClickListener(v -> remove());
+        bindDrag(deleteItemBtn);
+    }
+
+    @Override
+    public boolean onSelectedChanged() {
+        getMainView().setBackgroundColor(Color.BLUE);
+
+        return super.onSelectedChanged();
+    }
+
+    @Override
+    public boolean onClearView() {
+        getMainView().setBackgroundColor(Color.WHITE);
+        return super.onClearView();
     }
 }

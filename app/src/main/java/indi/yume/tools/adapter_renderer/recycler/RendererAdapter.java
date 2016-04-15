@@ -2,6 +2,7 @@ package indi.yume.tools.adapter_renderer.recycler;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,8 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
 
     private OnItemClickListener onItemClickListener;
     private OnLongClickListener onLongClickListener;
+
+    private ItemTouchHelper itemTouchHelper;
 
     public RendererAdapter(List<M> contentList, Context context, Class<? extends BaseRenderer<M>> renderClazz) {
         this(contentList, context, new SingleRenderBuilder<>(renderClazz));
@@ -99,8 +102,28 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
         notifyDataSetChanged();
     }
 
-    public DragHelper getDragHelper() {
-        return new DragHelper(this);
+    /*
+     * @hide
+     */
+    void setItemTouchHelper(ItemTouchHelper itemTouchHelper) {
+        this.itemTouchHelper = itemTouchHelper;
+    }
+
+    public DragHelper enableDrag(RecyclerView recyclerView) {
+        return enableDrag(recyclerView, true, true);
+    }
+
+    public DragHelper enableDrag(RecyclerView recyclerView, boolean enableLongPressDrag, boolean enableSwipeView) {
+        DragHelper dragHelper = new DragHelper(this, enableLongPressDrag, enableSwipeView);
+        itemTouchHelper = new ItemTouchHelper(dragHelper);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+
+        return dragHelper;
+    }
+
+    public void enableDrag(RecyclerView recyclerView, ItemTouchHelper.Callback callback) {
+        itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
     @Override
@@ -163,13 +186,13 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
     }
 
     @Override
-    public void putExtra(String key, Object data) {
-        extraDataMap.put(key, data);
+    public void putExtra(int position, Object data) {
+        extraDataMap.put(getExtraKey(position), data);
     }
 
     @Override
-    public Object getExtraData(String key) {
-        return extraDataMap.get(key);
+    public Object getExtraData(int position) {
+        return extraDataMap.get(getExtraKey(position));
     }
 
     @Override
@@ -183,5 +206,15 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
             return 0;
 
         return contentList.size();
+    }
+
+    @Override
+    public void startDrag(RecyclerView.ViewHolder viewHolder) {
+        if(itemTouchHelper != null)
+            itemTouchHelper.startDrag(viewHolder);
+    }
+
+    private static String getExtraKey(int position){
+        return String.valueOf(position);
     }
 }

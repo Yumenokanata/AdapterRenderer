@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 //        recyclerView.setItemAnimator(new FadeInLeftAnimator());
         RendererAdapter<TestModel> adapter = new RendererAdapter<>(getTestList(), this, CreateCompanyJobItemRenderer.class);
         recyclerView.setAdapter(adapter);
-        DragHelper.bind(recyclerView, adapter);
+        DragHelper.bind(recyclerView, adapter, false, false);
 
         setButton.setOnClickListener(new View.OnClickListener() {
             @Override

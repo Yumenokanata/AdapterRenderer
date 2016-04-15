@@ -23,4 +23,24 @@ public abstract class BaseDragHelper extends ItemTouchHelper.Callback {
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
         adapter.remove(viewHolder.getAdapterPosition());
     }
+
+    @Override
+    public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+        if(viewHolder instanceof RendererViewHolder) {
+            RendererViewHolder rendererViewHolder = (RendererViewHolder) viewHolder;
+            if(rendererViewHolder.getRenderer().onSelectedChanged())
+                return;
+        }
+        super.onSelectedChanged(viewHolder, actionState);
+    }
+
+    @Override
+    public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+        if(viewHolder instanceof RendererViewHolder) {
+            RendererViewHolder rendererViewHolder = (RendererViewHolder) viewHolder;
+            if(rendererViewHolder.getRenderer().onClearView())
+                return;
+        }
+        super.clearView(recyclerView, viewHolder);
+    }
 }

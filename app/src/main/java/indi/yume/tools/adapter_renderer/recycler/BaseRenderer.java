@@ -1,6 +1,8 @@
 package indi.yume.tools.adapter_renderer.recycler;
 
+import android.support.v4.view.MotionEventCompat;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -32,6 +34,10 @@ public abstract class BaseRenderer<M>{
 
     public M getContent() {
         return content;
+    }
+
+    public View getMainView() {
+        return viewHolder.itemView;
     }
 
     public void setContent(M content) {
@@ -74,7 +80,7 @@ public abstract class BaseRenderer<M>{
     protected Object getExtra(){
         if(rendererCallBack == null)
             return null;
-        return rendererCallBack.getExtraData(getExtraKey(getAdapterPosition()));
+        return rendererCallBack.getExtraData(getAdapterPosition());
     }
 
     protected Object getExtra(Object defaultValue){
@@ -89,11 +95,7 @@ public abstract class BaseRenderer<M>{
 
     protected void putExtra(Object object){
         if(rendererCallBack != null)
-            rendererCallBack.putExtra(getExtraKey(getAdapterPosition()), object);
-    }
-
-    private static String getExtraKey(int position){
-        return String.valueOf(position);
+            rendererCallBack.putExtra(getAdapterPosition(), object);
     }
 
     public void refresh() {
@@ -102,6 +104,31 @@ public abstract class BaseRenderer<M>{
 
     public void refresh(int position) {
         rendererCallBack.refresh(position);
+    }
+
+    public void startDrag() {
+        rendererCallBack.startDrag(getViewHolder());
+    }
+
+    public void bindDrag(View view) {
+        view.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (MotionEventCompat.getActionMasked(event) ==
+                        MotionEvent.ACTION_DOWN) {
+                    startDrag();
+                }
+                return false;
+            }
+        });
+    }
+
+    public boolean onSelectedChanged() {
+        return false;
+    }
+
+    public boolean onClearView() {
+        return false;
     }
 
     public void moveUp() {

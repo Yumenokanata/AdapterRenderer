@@ -1,5 +1,7 @@
 package indi.yume.tools.adapter_renderer.recycler;
 
+import android.support.v7.widget.RecyclerView;
+
 import java.util.Collection;
 
 /**
@@ -16,8 +18,10 @@ interface RendererCallBack<M> {
     void insertRange(int position, Collection<M> dataSet);
     void removeRange(int fromPosition, int itemCount);
 
-    void putExtra(String key, Object data);
-    Object getExtraData(String key);
+    void putExtra(int position, Object data);
+    Object getExtraData(int position);
     void clearAllExtraData();
     int getContentLength();
+
+    void startDrag(RecyclerView.ViewHolder viewHolder);
 }
