@@ -14,6 +14,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import indi.yume.tools.adapter_renderer.recycler.DragHelper;
 import indi.yume.tools.adapter_renderer.recycler.OnItemClickListener;
 import indi.yume.tools.adapter_renderer.recycler.RendererAdapter;
 
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
 //        recyclerView.setItemAnimator(new FadeInLeftAnimator());
         RendererAdapter<TestModel> adapter = new RendererAdapter<>(getTestList(), this, CreateCompanyJobItemRenderer.class);
         recyclerView.setAdapter(adapter);
+        DragHelper.bind(recyclerView, adapter);
 
         setButton.setOnClickListener(new View.OnClickListener() {
             @Override

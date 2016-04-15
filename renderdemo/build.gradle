@@ -42,6 +42,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:recyclerview-v7:23.1.1'
+    compile 'com.annimon:stream:1.0.8'
 
     compile 'jp.wasabeef:recyclerview-animators:2.2.1'
     compile 'org.solovyev.android.views:linear-layout-manager:0.5@aar'

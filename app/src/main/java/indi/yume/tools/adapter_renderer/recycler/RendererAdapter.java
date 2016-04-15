@@ -99,6 +99,10 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
         notifyDataSetChanged();
     }
 
+    public DragHelper getDragHelper() {
+        return new DragHelper(this);
+    }
+
     @Override
     public void refresh(int position) {
         notifyItemChanged(position);
@@ -106,12 +110,16 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
 
     @Override
     public void move(int from, int to) {
+        swap(from, to);
+        notifyItemRangeChanged(from < to ? from : to, getItemCount());
+    }
+
+    void swap(int from, int to) {
         Collections.swap(contentList, from, to);
         if(from < to)
             notifyItemMoved(from, to);
         else
             notifyItemMoved(to, from);
-        notifyItemRangeChanged(from < to ? from : to, getItemCount());
     }
 
     @Override
