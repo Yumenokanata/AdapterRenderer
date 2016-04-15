@@ -14,8 +14,18 @@ public class DragHelper extends BaseDragHelper {
     private boolean isLongPressDragEnabled = true;
     private boolean isItemViewSwipeEnabled = true;
 
+    private int mDefaultSwipeDirs = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
+    private int mDefaultDragDirs = ItemTouchHelper.START | ItemTouchHelper.END;
+
     public DragHelper(RendererAdapter adapter) {
         super(adapter);
+    }
+
+    public DragHelper(RendererAdapter adapter, int dragDirs, int swipeDirs) {
+        super(adapter);
+
+        mDefaultSwipeDirs = swipeDirs;
+        mDefaultDragDirs = dragDirs;
     }
 
     public static DragHelper bind(RecyclerView recyclerView, RendererAdapter adapter) {
@@ -36,9 +46,7 @@ public class DragHelper extends BaseDragHelper {
 
     @Override
     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-        int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
-        int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
-        return makeMovementFlags(dragFlags, swipeFlags);
+        return makeMovementFlags(mDefaultSwipeDirs, mDefaultDragDirs);
     }
 
     @Override
