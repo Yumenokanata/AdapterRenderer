@@ -1,3 +1,5 @@
+[![](https://jitpack.io/v/Yumenokanata/AdapterRenderer.svg)](https://jitpack.io/#Yumenokanata/AdapterRenderer)
+
 # AdapterRenderer
 BaseAdapter 的一个简单封装，包装了控件回收的代码，极大简化了Adapter的书写，可用于ListView与GridView
 
@@ -15,7 +17,7 @@ allprojects {
 Step2: 在工程中添加依赖：
 ```groovy
 dependencies {
-    compile 'com.github.Yumenokanata:AdapterRenderer:1.8.6@aar'
+    compile 'com.github.Yumenokanata:AdapterRenderer:x.y.z@aar'
 }
 ```
 
