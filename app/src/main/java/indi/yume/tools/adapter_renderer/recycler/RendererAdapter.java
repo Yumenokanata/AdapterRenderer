@@ -8,11 +8,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import indi.yume.tools.adapter_renderer.ContextAware;
 
@@ -30,6 +34,10 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
     private OnLongClickListener onLongClickListener;
 
     private ItemTouchHelper itemTouchHelper;
+
+    private Set<Integer> selections = new HashSet<>();
+    private boolean enableSelectable = false;
+    private boolean enableMultipleSelectable = true;
 
     public RendererAdapter(List<M> contentList, Context context, Class<? extends BaseRenderer<M>> renderClazz) {
         this(contentList, context, new SingleRenderBuilder<>(renderClazz));
@@ -68,6 +76,40 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
         renderer.render();
     }
 
+    public boolean isEnableSelectable() {
+        return enableSelectable;
+    }
+
+    public void enableSelectable(boolean enableSelectable) {
+        this.enableSelectable = enableSelectable;
+        for(Integer index : selections)
+            notifyItemChanged(index);
+        selections.clear();
+    }
+
+    public boolean isEnableMultipleSelectable() {
+        return enableMultipleSelectable;
+    }
+
+    public void enableMultipleSelectable(boolean enableMultipleSelectable) {
+        this.enableMultipleSelectable = enableMultipleSelectable;
+
+        Integer index = null;
+        for(int i : selections) {
+            index = i;
+            break;
+        }
+        if(index == null)
+            return;
+
+        for(int position : selections)
+            if(position != index)
+                notifyItemChanged(index);
+        selections.clear();
+
+        selections.add(index);
+    }
+
     protected void doForEveryRenderer(BaseRenderer<M> renderer, int viewType) { }
 
     @Override
@@ -90,6 +132,7 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
 
     public void setContentList(List<M> contentList) {
         this.contentList = contentList;
+        selections.clear();
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
@@ -139,6 +182,15 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
 
     void swap(int from, int to) {
         Collections.swap(contentList, from, to);
+
+        if(selections.contains(from) && !selections.contains(to)) {
+            selections.remove(from);
+            selections.add(to);
+        } else if(selections.contains(to) && !selections.contains(from)) {
+            selections.remove(to);
+            selections.add(from);
+        }
+
         if(from < to)
             notifyItemMoved(from, to);
         else
@@ -148,15 +200,41 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
     @Override
     public void insert(int position, M model) {
         contentList.add(position, model);
+
+        Set<Integer> newSet = new HashSet<>();
+        for(int index : selections)
+            if(index >= position) {
+                selections.remove(index);
+                newSet.add(index + 1);
+            } else {
+                newSet.add(index);
+            }
+        selections = newSet;
+
         notifyItemInserted(position);
         notifyItemRangeChanged(position, getItemCount());
     }
 
     @Override
     public void remove(int position) {
-        contentList.remove(position);
+        selections.remove(position);
         notifyItemRemoved(position);
+        contentList.remove(position);
         notifyItemRangeChanged(0, getItemCount());
+    }
+
+    public List<M> remove(Iterable<Integer> deleteIndex) {
+        List<M> list = new LinkedList<>();
+        for(int position : deleteIndex) {
+            list.add(contentList.get(position));
+            selections.remove(position);
+            notifyItemRemoved(position);
+        }
+
+        contentList.removeAll(list);
+        notifyItemRangeChanged(0, getItemCount());
+
+        return list;
     }
 
     @Override
@@ -171,7 +249,21 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
 
     @Override
     public void insertRange(int position, Collection<M> dataSet) {
+        int oldSize = contentList.size();
         contentList.addAll(position, dataSet);
+        int newSize = contentList.size();
+
+        int interval = newSize - oldSize;
+        Set<Integer> newSet = new HashSet<>();
+        for(int index : selections)
+            if(index >= position) {
+                selections.remove(index);
+                newSet.add(index + interval);
+            } else {
+                newSet.add(index);
+            }
+        selections = newSet;
+
         notifyItemRangeInserted(position, dataSet.size());
         notifyItemRangeChanged(position, getItemCount());
     }
@@ -179,8 +271,10 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
     @Override
     public void removeRange(int fromPosition, int itemCount) {
         for(int i = 0; i < itemCount; i++)
-            if(fromPosition < contentList.size())
+            if(fromPosition < contentList.size()) {
                 contentList.remove(fromPosition);
+                selections.remove(fromPosition);
+            }
         notifyItemRangeRemoved(fromPosition, itemCount);
         notifyItemRangeChanged(0, getItemCount());
     }
@@ -209,6 +303,20 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
     }
 
     @Override
+    public boolean getIsSelected(int position) {
+        return selections.contains(position);
+    }
+
+    @Override
+    public void setSelect(int position, boolean isSelected) {
+        if(enableSelectable)
+            if(isSelected)
+                select(position);
+            else
+                deselect(position);
+    }
+
+    @Override
     public void startDrag(RecyclerView.ViewHolder viewHolder) {
         if(itemTouchHelper != null)
             itemTouchHelper.startDrag(viewHolder);
@@ -216,5 +324,77 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
 
     private static String getExtraKey(int position){
         return String.valueOf(position);
+    }
+
+    public Set<Integer> getSelections() {
+        return selections;
+    }
+
+    public Set<M> getSelectedItems() {
+        Set<M> itemSet = new HashSet<>();
+        for(Integer index : selections)
+            itemSet.add(getItem(index));
+        return itemSet;
+    }
+
+    @Override
+    public void toggleSelection(int position) {
+        if(!enableSelectable)
+            return;
+
+        if(selections.contains(position))
+            deselect(position);
+        else
+            select(position);
+    }
+
+    public void select(Iterable<Integer> selectIndex) {
+        for(Integer index : selectIndex)
+            select(index);
+    }
+
+    public void select(int position) {
+        if(!enableMultipleSelectable) {
+            for(int index : selections)
+                if(position != index)
+                    notifyItemChanged(index);
+            selections.clear();
+        }
+
+        selections.add(position);
+        notifyItemChanged(position);
+    }
+
+    public void deselect() {
+        for(int index : selections)
+            notifyItemChanged(index);
+        selections.clear();
+    }
+
+    public void deselect(Iterable<Integer> deselectIndex) {
+        for(Integer index : deselectIndex)
+            deselect(index);
+    }
+
+    public void deselect(int position) {
+        selections.remove(position);
+        notifyItemChanged(position);
+    }
+
+    public List<M> deleteAllSelectedItems() {
+        if(!enableSelectable)
+            return new ArrayList<>();
+
+        List<M> list = new LinkedList<>();
+        for(int position : selections) {
+            list.add(contentList.get(position));
+            notifyItemRemoved(position);
+        }
+        selections.clear();
+
+        contentList.removeAll(list);
+        notifyItemRangeChanged(0, getItemCount());
+
+        return list;
     }
 }

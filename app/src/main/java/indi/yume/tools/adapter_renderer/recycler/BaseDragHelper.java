@@ -9,6 +9,8 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 public abstract class BaseDragHelper extends ItemTouchHelper.Callback {
     protected RendererAdapter adapter;
 
+    private boolean hasMoved = false;
+
     public BaseDragHelper(RendererAdapter adapter) {
         this.adapter = adapter;
     }
@@ -16,6 +18,7 @@ public abstract class BaseDragHelper extends ItemTouchHelper.Callback {
     @Override
     public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
         adapter.swap(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+        hasMoved = true;
         return true;
     }
 
@@ -40,6 +43,10 @@ public abstract class BaseDragHelper extends ItemTouchHelper.Callback {
             RendererViewHolder rendererViewHolder = (RendererViewHolder) viewHolder;
             if(rendererViewHolder.getRenderer().onClearView())
                 return;
+        }
+        if(hasMoved) {
+            adapter.notifyDataSetChanged();
+            hasMoved = false;
         }
         super.clearView(recyclerView, viewHolder);
     }

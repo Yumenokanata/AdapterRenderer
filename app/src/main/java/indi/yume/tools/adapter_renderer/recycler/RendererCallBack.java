@@ -23,5 +23,9 @@ interface RendererCallBack<M> {
     void clearAllExtraData();
     int getContentLength();
 
+    boolean getIsSelected(int position);
+    void setSelect(int position, boolean isSelected);
+    void toggleSelection(int position);
+
     void startDrag(RecyclerView.ViewHolder viewHolder);
 }

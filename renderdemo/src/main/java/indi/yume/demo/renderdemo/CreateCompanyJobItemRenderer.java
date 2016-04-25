@@ -39,6 +39,11 @@ public class CreateCompanyJobItemRenderer extends BaseRenderer<TestModel> {
                 getAdapterPosition() == 0 ? R.drawable.icon_not_move_left : R.drawable.icon_up);
         moveDownBtn.setBackgroundResource(
                 getAdapterPosition() == getContentLength() - 1 ? R.drawable.icon_not_move_right : R.drawable.icon_down);
+
+        if(isSelected())
+            getMainView().setBackgroundColor(Color.RED);
+        else
+            getMainView().setBackgroundColor(Color.WHITE);
     }
 
     @Override
@@ -59,19 +64,23 @@ public class CreateCompanyJobItemRenderer extends BaseRenderer<TestModel> {
         moveDownBtn.setOnClickListener(v -> {
             moveDown();
         });
-        bindDrag(deleteItemBtn);
+        deleteItemBtn.setOnClickListener(v -> {
+//            toggleSelection();
+            remove();
+        });
+//        bindDrag(deleteItemBtn);
     }
 
     @Override
     public boolean onSelectedChanged() {
-        getMainView().setBackgroundColor(Color.BLUE);
+//        getMainView().setBackgroundColor(Color.BLUE);
 
         return super.onSelectedChanged();
     }
 
     @Override
     public boolean onClearView() {
-        getMainView().setBackgroundColor(Color.WHITE);
+//        getMainView().setBackgroundColor(Color.WHITE);
         return super.onClearView();
     }
 }

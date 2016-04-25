@@ -40,6 +40,17 @@ public abstract class BaseRenderer<M>{
         return viewHolder.itemView;
     }
 
+    public boolean isSelected() {
+        return rendererCallBack.getIsSelected(getAdapterPosition());
+    }
+
+    public void setSelect(boolean isSelected) {
+        rendererCallBack.setSelect(getAdapterPosition(), isSelected);
+    }
+    public void toggleSelection() {
+        rendererCallBack.toggleSelection(getAdapterPosition());
+    }
+
     public void setContent(M content) {
         this.content = content;
     }
@@ -150,7 +161,9 @@ public abstract class BaseRenderer<M>{
     }
 
     public void remove() {
-        remove(getAdapterPosition());
+        int position = getAdapterPosition();
+        if(position >= 0)
+            remove(position);
     }
 
     public void remove(int position) {
