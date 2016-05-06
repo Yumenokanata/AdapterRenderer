@@ -39,8 +39,14 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         adapter.enableDrag(recyclerView);
         adapter.enableSelectable(true);
-        adapter.enableMultipleSelectable(true);
+        adapter.enableMultipleSelectable(false);
 //        DragHelper.bind(recyclerView, adapter, false, false);
+        adapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                adapter.toggleSelection(position);
+            }
+        });
 
         setButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,7 +56,8 @@ public class MainActivity extends AppCompatActivity {
                         .collect(Collectors.joining());
 
                 Toast.makeText(MainActivity.this, selectString, Toast.LENGTH_SHORT).show();
-                adapter.deleteAllSelectedItems();
+//                adapter.deleteAllSelectedItems();
+                adapter.removeRange(2, 3);
             }
         });
 
