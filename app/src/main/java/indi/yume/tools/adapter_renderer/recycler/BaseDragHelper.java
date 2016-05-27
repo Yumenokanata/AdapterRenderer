@@ -17,14 +17,21 @@ public abstract class BaseDragHelper extends ItemTouchHelper.Callback {
 
     @Override
     public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-        adapter.swap(viewHolder.getAdapterPosition(), target.getAdapterPosition());
-        hasMoved = true;
-        return true;
+        int viewHolderPosition = viewHolder.getAdapterPosition();
+        int targetPosition = target.getAdapterPosition();
+
+        if(adapter.checkIndex(viewHolderPosition) && adapter.checkIndex(targetPosition)) {
+            adapter.swap(adapter.getReallyIndex(viewHolderPosition),
+                    adapter.getReallyIndex(targetPosition));
+            hasMoved = true;
+            return true;
+        }
+        return false;
     }
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-        adapter.remove(viewHolder.getAdapterPosition());
+        adapter.remove(adapter.getReallyIndex(viewHolder.getAdapterPosition()));
     }
 
     @Override

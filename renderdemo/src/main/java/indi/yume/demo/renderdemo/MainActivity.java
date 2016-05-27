@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.annimon.stream.Collectors;
@@ -36,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 //        recyclerView.setItemAnimator(new FadeInLeftAnimator());
         RendererAdapter<TestModel> adapter = new RendererAdapter<>(getTestList(), this, CreateCompanyJobItemRenderer.class);
+
+        addOtherView(adapter);
+
         recyclerView.setAdapter(adapter);
         adapter.enableDrag(recyclerView);
         adapter.enableSelectable(true);
@@ -44,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                adapter.toggleSelection(position);
+                Toast.makeText(MainActivity.this, "click " + position, Toast.LENGTH_LONG).show();
             }
         });
 
@@ -64,9 +68,47 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setNestedScrollingEnabled(false);
     }
 
+    private <T> void addOtherView(RendererAdapter<T> adapter) {
+        TextView textView = new TextView(this);
+        textView.setText("header 1");
+
+        adapter.addHeaderView(textView);
+
+        textView = new TextView(this);
+        textView.setText("header 2");
+
+        adapter.addHeaderView(textView);
+
+        textView = new TextView(this);
+        textView.setText("header 3");
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "header 3", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        adapter.addHeaderView(textView);
+
+        TextView footerTextView = new TextView(this);
+        footerTextView.setText("footer 1");
+
+        adapter.addFooterView(footerTextView);
+
+        footerTextView = new TextView(this);
+        footerTextView.setText("footer 2");
+
+        adapter.addFooterView(footerTextView);
+
+        footerTextView = new TextView(this);
+        footerTextView.setText("footer 3");
+
+        adapter.addFooterView(footerTextView);
+    }
+
     private List<TestModel> getTestList() {
         List<TestModel> list = new ArrayList<>();
-        for (int i = 0; i < 500; i++)
+        for (int i = 0; i < 5; i++)
             list.add(new TestModel("Test111" + i + i + i));
         return list;
     }

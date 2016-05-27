@@ -60,7 +60,7 @@ public abstract class BaseRenderer<M>{
     }
 
     public int getAdapterPosition() {
-        return viewHolder.getAdapterPosition();
+        return rendererCallBack.getReallyIndex(viewHolder.getAdapterPosition());
     }
 
     public int getLayoutPosition() {
@@ -143,13 +143,15 @@ public abstract class BaseRenderer<M>{
     }
 
     public void moveUp() {
-        if(getAdapterPosition() > 0)
-            move(getAdapterPosition(), getAdapterPosition() - 1);
+        int position = getAdapterPosition();
+        if(position > 0 && rendererCallBack.checkIndex(viewHolder.getAdapterPosition() - 1))
+            move(position, position - 1);
     }
 
     public void moveDown() {
-        if(getAdapterPosition() < getContentLength() - 1)
-            move(getAdapterPosition(), getAdapterPosition() + 1);
+        int position = getAdapterPosition();
+        if(position < getContentLength() - 1 && rendererCallBack.checkIndex(viewHolder.getAdapterPosition() + 1))
+            move(position, position + 1);
     }
 
     public void move(int from, int to) {

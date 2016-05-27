@@ -2,13 +2,11 @@ package indi.yume.tools.adapter_renderer.recycler;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
-
-import com.annimon.stream.Stream;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,12 +17,12 @@ import java.util.List;
 import java.util.Set;
 
 import indi.yume.tools.adapter_renderer.ContextAware;
+import indi.yume.tools.adapter_renderer.recycler.headerfooter.OtherViewManger;
 import indi.yume.tools.adapter_renderer.recycler.select.MultipleSelectCollect;
 import indi.yume.tools.adapter_renderer.recycler.select.SelectCollect;
 import indi.yume.tools.adapter_renderer.recycler.select.SelectMode;
 import indi.yume.tools.adapter_renderer.recycler.select.SingleSelectCollect;
 import indi.yume.tools.adapter_renderer.util.ListUtil;
-import lombok.Setter;
 
 /**
  * Created by yume on 16-2-29.
@@ -48,6 +46,9 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
     @SelectMode
     private int selectMode = SelectMode.SELECT_MODE_MULTIPLE;
     private boolean enableSelectable = false;
+
+    @NonNull
+    private OtherViewManger otherViewManger = new OtherViewManger();
 
     public RendererAdapter(List<M> contentList, Context context, Class<? extends BaseRenderer<M>> renderClazz) {
         this(contentList, context, new SingleRenderBuilder<>(renderClazz));
@@ -87,6 +88,9 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
 
     @Override
     public RendererViewHolder<M> onCreateViewHolder(ViewGroup parent, int viewType) {
+        if(otherViewManger.isOtherView(viewType))
+            return otherViewManger.getViewHolder(viewType);
+
         BaseRenderer<M> renderer = rendererBuilder.setParent(parent)
                 .setLayoutInflater(layoutInflater)
                 .setRendererCallback(this)
@@ -99,7 +103,12 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
     }
 
     @Override
-    public void onBindViewHolder(RendererViewHolder<M> holder, final int position) {
+    public void onBindViewHolder(RendererViewHolder<M> holder, final int oriPos) {
+        if(otherViewManger.isOtherView(oriPos, getContentLength()))
+            return;
+
+        final int position = getReallyIndex(oriPos);
+
         BaseRenderer<M> renderer = holder.getRenderer();
         renderer.setContent(getItem(position));
         doForEveryRenderer(renderer, holder.getItemViewType());
@@ -109,6 +118,30 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
         renderer.setOnLongClickListener(onLongClickListener);
 
         renderer.render();
+    }
+
+    public boolean addHeaderView(View view) {
+        return otherViewManger.addHeaderView(view);
+    }
+
+    public boolean addFooterView(View view) {
+        return otherViewManger.addFooterView(view);
+    }
+
+    public boolean removeHeaderView(View view) {
+        return otherViewManger.removeHeaderView(view);
+    }
+
+    public boolean removeFooterView(View view) {
+        return otherViewManger.removeFooterView(view);
+    }
+
+    public int getHeaderViewCount() {
+        return otherViewManger.headerViewCount();
+    }
+
+    public int getFooterViewCount() {
+        return otherViewManger.footerViewCount();
     }
 
     public boolean isEnableSelectable() {
@@ -134,12 +167,31 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
 
     @Override
     public int getItemCount() {
-        return contentList.size();
+        return contentList.size() + otherViewManger.getOtherViewCount();
     }
 
     @Override
-    public int getItemViewType(int position) {
-        return rendererBuilder.getViewType(position, getItem(position));
+    public int getReallyIndex(int oriPos) {
+        return otherViewManger.getContentIndex(oriPos);
+    }
+
+    @Override
+    public boolean checkIndex(int pos) {
+        return otherViewManger.checkIndex(pos, getContentLength());
+    }
+
+    public int getAdapterIndex(int contentIndex) {
+        return otherViewManger.getAdapterIndex(contentIndex);
+    }
+
+    @Override
+    public int getItemViewType(int oriPos) {
+        if(otherViewManger.isOtherView(oriPos, getContentLength())) {
+            return otherViewManger.viewType(oriPos, getContentLength());
+        } else {
+            int position = getReallyIndex(oriPos);
+            return rendererBuilder.getViewType(getReallyIndex(position), getItem(position));
+        }
     }
 
     public M getItem(int position) {
@@ -192,13 +244,17 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
 
     @Override
     public void refresh(int position) {
-        notifyItemChanged(position);
+        notifyItemChanged(getAdapterIndex(position));
     }
 
     @Override
     public void move(int from, int to) {
         swap(from, to);
-        notifyItemRangeChanged(from < to ? from : to, getItemCount());
+        int target = from < to ? from : to;
+        int sumCount = Math.abs(to - from) + 1;
+        notifyItemRangeChangedWithCheck(
+                target,
+                sumCount);
     }
 
     void swap(int from, int to) {
@@ -207,9 +263,12 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
         selectCollect.swap(from, to);
 
         if(from < to)
-            notifyItemMoved(from, to);
+            notifyItemMoved(getAdapterIndex(from),
+                    getAdapterIndex(to));
         else
-            notifyItemMoved(to, from);
+            notifyItemMoved(
+                    getAdapterIndex(to),
+                    getAdapterIndex(from));
     }
 
     @Override
@@ -218,18 +277,18 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
         extraDataList.add(position, null);
         selectCollect.insertItem(position);
 
-        notifyItemInserted(position);
-        notifyItemRangeChanged(position, getItemCount());
+        notifyItemInserted(getAdapterIndex(position));
+        notifyItemRangeChangedWithCheck(position, getItemCount());
     }
 
     @Override
     public void remove(int position) {
-        notifyItemRemoved(position);
+        notifyItemRemoved(getAdapterIndex(position));
         contentList.remove(position);
         extraDataList.remove(position);
         selectCollect.removeItem(position);
 
-        notifyItemRangeChanged(0, getItemCount());
+        notifyItemRangeChangedWithCheck(0, getItemCount());
     }
 
     public List<M> remove(Iterable<Integer> deleteIndex) {
@@ -237,13 +296,13 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
         for(int position : deleteIndex) {
             list.add(contentList.get(position));
 
-            notifyItemRemoved(position);
+            notifyItemRemoved(getAdapterIndex(position));
             contentList.remove(position);
             extraDataList.remove(position);
             selectCollect.removeItem(position);
         }
 
-        notifyItemRangeChanged(0, getItemCount());
+        notifyItemRangeChangedWithCheck(0, getItemCount());
 
         return list;
     }
@@ -255,7 +314,9 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
 
     @Override
     public void refresh(int fromPosition, int itemCount) {
-        notifyItemRangeChanged(fromPosition, itemCount);
+        notifyItemRangeChangedWithCheck(
+                fromPosition,
+                itemCount);
     }
 
     @Override
@@ -267,8 +328,8 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
             selectCollect.insertItem(position);
         }
 
-        notifyItemRangeInserted(position, dataSet.size());
-        notifyItemRangeChanged(position, getItemCount());
+        notifyItemRangeInserted(getAdapterIndex(position), dataSet.size());
+        notifyItemRangeChangedWithCheck(position, getItemCount());
     }
 
     @Override
@@ -279,8 +340,8 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
                 extraDataList.remove(fromPosition);
                 selectCollect.removeItem(fromPosition);
             }
-        notifyItemRangeRemoved(fromPosition, itemCount);
-        notifyItemRangeChanged(0, getItemCount());
+        notifyItemRangeRemoved(getAdapterIndex(fromPosition), itemCount);
+        notifyItemRangeChangedWithCheck(0, getItemCount());
     }
 
     @Override
@@ -387,7 +448,7 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
         List<M> list = new LinkedList<>();
         for(int position : selectIndexSet) {
             list.add(contentList.get(position));
-            notifyItemRemoved(position);
+            notifyItemRemoved(getAdapterIndex(position));
         }
         selectCollect.deselectAll();
 
@@ -395,5 +456,11 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
         notifyDataSetChanged();
 
         return list;
+    }
+
+    private void notifyItemRangeChangedWithCheck(int fromPosition, int count) {
+        notifyItemRangeChanged(
+                getAdapterIndex(fromPosition),
+                Math.min(getContentLength() - fromPosition, count));
     }
 }

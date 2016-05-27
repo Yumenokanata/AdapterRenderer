@@ -28,4 +28,7 @@ interface RendererCallBack<M> {
     void toggleSelection(int position);
 
     void startDrag(RecyclerView.ViewHolder viewHolder);
+
+    int getReallyIndex(int oriPos);
+    boolean checkIndex(int pos);
 }
