@@ -405,6 +405,17 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
         return selectSet;
     }
 
+    public List<M> getSelectedItemsSorted() {
+        List<M> selectList = new LinkedList<>();
+        List<Integer> selectIndexList = new ArrayList<>(selectCollect.getSelections());
+        Collections.sort(selectIndexList);
+
+        for(int index : selectIndexList)
+            selectList.add(contentList.get(index));
+
+        return selectList;
+    }
+
     @Override
     public void toggleSelection(int position) {
         if(!enableSelectable)
