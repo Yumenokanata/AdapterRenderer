@@ -66,7 +66,7 @@ public class MessageRenderer extends BaseRenderer<MessageModel> {
 }
 ```
 
-二、Renderer的使用
+二、Renderer的使用  
 2.1. 单个renderer
 ```java
 BaseAdapter listViewAdapter = new RendererAdapter<>(
@@ -75,7 +75,7 @@ BaseAdapter listViewAdapter = new RendererAdapter<>(
                                   MessageRenderer.class); \\渲染类
 ```
                                   
-2.2. 多中Renderer
+2.2. 多中Renderer  
 2.2.1. RendererBuilder
 ```java
 public class MessageRendererBuilder extends BaseRendererBuilder<MessageModel> {
