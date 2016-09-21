@@ -21,14 +21,18 @@ public abstract class BaseRenderer<M>{
     private View.OnClickListener viewOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if(onItemClickListener != null)
-                onItemClickListener.onItemClick(v, getAdapterPosition());
+            if(onItemClickListener != null) {
+                int p = getAdapterPosition();
+                if(p >= 0)
+                    onItemClickListener.onItemClick(v, p);
+            }
         }
     };
     private View.OnLongClickListener viewOnLongClickListener = new View.OnLongClickListener() {
         @Override
         public boolean onLongClick(View v) {
-            return onLongClickListener != null && onLongClickListener.onLongClick(v, getAdapterPosition());
+            int p = getAdapterPosition();
+            return onLongClickListener != null && p >=0 && onLongClickListener.onLongClick(v, p);
         }
     };
 
