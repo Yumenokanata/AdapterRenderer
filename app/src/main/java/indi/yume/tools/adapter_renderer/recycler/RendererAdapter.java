@@ -82,6 +82,12 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
         refreshCanSelectedState();
     }
 
+    public boolean isCanBeSelected(int p) {
+        if(isCanBeSelectedFilter != null && contentList != null)
+            return isCanBeSelectedFilter.isCanBeSelected(p, contentList.get(p));
+        return true;
+    }
+
     private void refreshCanSelectedState() {
         if(enableSelectable && isCanBeSelectedFilter != null)
             for(int p = 0; p < contentList.size(); p++)
