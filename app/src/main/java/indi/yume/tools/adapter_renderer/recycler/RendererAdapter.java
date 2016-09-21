@@ -2,6 +2,7 @@ package indi.yume.tools.adapter_renderer.recycler;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
@@ -33,6 +34,8 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
     private Context context;
     private BaseRendererBuilder<M> rendererBuilder;
 //    private Map<String, Object> extraDataMap = new HashMap<>();
+    @Nullable
+    private SelectCheck<M> isCanBeSelectedFilter = null;
     @NonNull
     private List<Object> extraDataList;
 
@@ -72,6 +75,18 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
     private void initSelectCollect() {
         selectCollect = provideSelectCollect(selectMode);
         selectCollect.changeSize(contentList.size());
+    }
+
+    public void setCanSelectedFilter(SelectCheck<M> isCanBeSelectedFilter) {
+        this.isCanBeSelectedFilter = isCanBeSelectedFilter;
+        refreshCanSelectedState();
+    }
+
+    private void refreshCanSelectedState() {
+        if(enableSelectable && isCanBeSelectedFilter != null)
+            for(int p = 0; p < contentList.size(); p++)
+                if(selectCollect.isSelect(p) && !isCanBeSelectedFilter.isCanBeSelected(p, contentList.get(p)))
+                    selectCollect.deselect(p);
     }
 
     @NonNull
@@ -206,6 +221,9 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
         this.contentList = contentList;
         extraDataList = ListUtil.newSizeList(extraDataList, contentList.size());
         selectCollect.changeSize(contentList.size());
+
+        //用于在contentList被重设刷新界面后的是否可选状态的重过滤
+        refreshCanSelectedState();
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
@@ -421,22 +439,40 @@ public class RendererAdapter<M> extends RecyclerView.Adapter<RendererViewHolder<
         if(!enableSelectable)
             return;
 
+        if(isCanBeSelectedFilter != null
+                && contentList != null
+                && !isCanBeSelectedFilter.isCanBeSelected(position, getItem(position)))
+            return;
+
         selectCollect.toggleSelection(position);
         notifyDataSetChanged();
     }
 
     public void select(Iterable<Integer> selectIndex) {
-        selectCollect.select(selectIndex);
+        if(isCanBeSelectedFilter != null
+                && contentList != null) {
+            List<Integer> indexes = new LinkedList<>();
+            for(Integer p : selectIndex)
+                if(isCanBeSelectedFilter.isCanBeSelected(p, getItem(p)))
+                    indexes.add(p);
+            selectCollect.select(indexes);
+        } else {
+            selectCollect.select(selectIndex);
+        }
         notifyDataSetChanged();
     }
 
     public void select(int position) {
+        if(isCanBeSelectedFilter != null
+                && contentList != null
+                && !isCanBeSelectedFilter.isCanBeSelected(position, getItem(position)))
+            return;
+
         selectCollect.select(position);
         notifyDataSetChanged();
     }
 
     public void deselect() {
-        Set<Integer> selectIndexSet = selectCollect.getSelections();
         selectCollect.deselectAll();
         notifyDataSetChanged();
     }
